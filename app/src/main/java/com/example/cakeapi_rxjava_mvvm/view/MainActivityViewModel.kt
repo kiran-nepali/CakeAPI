@@ -21,11 +21,13 @@ class MainActivityViewModel:ViewModel() {
     val cakeObserver = CakeObserver()
     private var cakelist: MutableLiveData<List<Cake>>? = MutableLiveData()
     val compositeDisposable = CompositeDisposable()
+    private var progressbar: MutableLiveData<Boolean> = MutableLiveData()
 
     fun getCakeInfo(){
+        progressbar.value = true
         val cakeRequest = RetrofitInstance().retrofitInstance.create(GetCakeRequest::class.java)
         val call: Observable<List<Cake>> = cakeRequest.CakeRequest()
-         call
+        call
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(cakeObserver)
@@ -42,8 +44,8 @@ class MainActivityViewModel:ViewModel() {
             }
 
             override fun onNext(t: List<Cake>) {
-                //passToMainActivity(t)
                  cakelist?.value = t
+                progressbar.value = false
 
             }
 
@@ -56,6 +58,10 @@ class MainActivityViewModel:ViewModel() {
 
      fun passToMainActivity():MutableLiveData<List<Cake>>?{
          return cakelist
+    }
+
+    fun showProgress():MutableLiveData<Boolean>{
+        return progressbar
     }
 
     override fun onCleared() {
