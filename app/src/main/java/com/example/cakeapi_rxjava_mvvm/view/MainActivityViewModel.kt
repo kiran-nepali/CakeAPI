@@ -1,6 +1,7 @@
 package com.example.cakeapi_rxjava_mvvm.view
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.example.cakeapi_rxjava_mvvm.model.Cake
@@ -18,13 +19,13 @@ import java.util.*
 class MainActivityViewModel:ViewModel() {
 
     val cakeObserver = CakeObserver()
-    var cakelist: List<Cake>? = null
+    private var cakelist: MutableLiveData<List<Cake>>? = MutableLiveData()
     val compositeDisposable = CompositeDisposable()
 
     fun getCakeInfo(){
         val cakeRequest = RetrofitInstance().retrofitInstance.create(GetCakeRequest::class.java)
         val call: Observable<List<Cake>> = cakeRequest.CakeRequest()
-        call
+         call
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(cakeObserver)
@@ -33,27 +34,27 @@ class MainActivityViewModel:ViewModel() {
     private fun CakeObserver() : io.reactivex.Observer<List<Cake>> {
         return object:io.reactivex.Observer<List<Cake>>{
             override fun onComplete() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                Log.d("emitted","all items emitted")
             }
 
             override fun onSubscribe(d: Disposable) {
-                compositeDisposable
+                compositeDisposable.add(d)
             }
 
             override fun onNext(t: List<Cake>) {
                 //passToMainActivity(t)
-                cakelist = t
+                 cakelist?.value = t
+
             }
 
             override fun onError(e: Throwable) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                Log.d("errormsg",e.message)
             }
 
         }
     }
 
-     fun passToMainActivity():List<Cake>?{
-         Log.d("res",cakelist!![1].title)
+     fun passToMainActivity():MutableLiveData<List<Cake>>?{
          return cakelist
     }
 
