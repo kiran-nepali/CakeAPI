@@ -46,7 +46,7 @@ class MainActivityViewModel:ViewModel() {
             }
 
             override fun onError(e: Throwable) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                Log.d("errormsg",e.message)
             }
 
         }
