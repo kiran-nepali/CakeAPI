@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         val roomcake: MutableLiveData<List<Cake>>? = viewModel.passToRoom()
         roomcake?.observe(this,object:Observer<List<Cake>>{
             override fun onChanged(t: List<Cake>?) {
-//                Log.d("roomtitle", t!![0].title)
+                Log.d("roomtitle", t!![0].title)
             }
 
         })

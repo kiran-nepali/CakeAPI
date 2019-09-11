@@ -86,7 +86,6 @@ class MainActivityViewModel(application: Application): AndroidViewModel(applicat
             }
 
             override fun onNext(t: List<Cake>) {
-                Log.d("insertcake",t.get(0).title)
                 cakelist?.value = t
                 insertCakeInfo(t)
                 progressbar.value = false
