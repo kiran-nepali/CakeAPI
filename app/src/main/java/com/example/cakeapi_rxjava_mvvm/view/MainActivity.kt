@@ -4,15 +4,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cakeapi_rxjava_mvvm.R
+import com.example.cakeapi_rxjava_mvvm.database.CakeAppDatabase
 import com.example.cakeapi_rxjava_mvvm.model.Cake
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var roomdb: CakeAppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +23,10 @@ class MainActivity : AppCompatActivity() {
 
         val viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
         viewModel.getCakeInfo()
+
         val cakeinfo:MutableLiveData<List<Cake>>? = viewModel.passToMainActivity()
         val showProgressbar:MutableLiveData<Boolean> = viewModel.showProgress()
+        roomdb = CakeAppDatabase.getInstance(applicationContext)
 
         cakeinfo?.observe(this,object:Observer<List<Cake>>{
             override fun onChanged(t: List<Cake>?) {
@@ -29,6 +34,17 @@ class MainActivity : AppCompatActivity() {
                 Log.d("desc",t!![0].desc)
                 recyclerview.layoutManager= LinearLayoutManager(this@MainActivity)
                 recyclerview.adapter = Adapter(t)
+            }
+        })
+
+        viewModel.showSuccess.observe(this, Observer {
+
+            if (it == true){
+                Toast.makeText(this,"Added user successfully", Toast.LENGTH_SHORT).show()
+                Log.d("success","Data inserted ")
+            }else{
+                Toast.makeText(this,"Something went wrong", Toast.LENGTH_SHORT).show()
+
             }
         })
 
@@ -40,6 +56,15 @@ class MainActivity : AppCompatActivity() {
                 if (t == false){
                     pgbar.visibility = View.GONE
                 }
+            }
+
+        })
+
+        viewModel.getCakeRoomInfo()
+        val roomcake: MutableLiveData<List<Cake>>? = viewModel.passToRoom()
+        roomcake?.observe(this,object:Observer<List<Cake>>{
+            override fun onChanged(t: List<Cake>?) {
+//                Log.d("roomtitle", t!![0].title)
             }
 
         })
