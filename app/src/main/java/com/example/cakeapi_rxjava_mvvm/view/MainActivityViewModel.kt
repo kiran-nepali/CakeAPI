@@ -5,17 +5,19 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.cakeapi_rxjava_mvvm.database.CakeAppDatabase
 import com.example.cakeapi_rxjava_mvvm.model.Cake
 import com.example.cakeapi_rxjava_mvvm.network.GetCakeRequest
-import com.example.cakeapi_rxjava_mvvm.network.RetrofitInstance
+//import com.example.cakeapi_rxjava_mvvm.network.RetrofitInstance
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class MainActivityViewModel(application: Application): AndroidViewModel(application) {
+class MainActivityViewModel @Inject constructor(application: Application,val clientInterface: GetCakeRequest): ViewModel() {
 
     val cakeObserver = CakeObserver()
     private var cakelist: MutableLiveData<List<Cake>>? = MutableLiveData()
@@ -67,8 +69,8 @@ class MainActivityViewModel(application: Application): AndroidViewModel(applicat
     }
     fun getCakeInfo(){
         progressbar.value = true
-        val cakeRequest = RetrofitInstance().retrofitInstance.create(GetCakeRequest::class.java)
-        val call: Observable<List<Cake>> = cakeRequest.CakeRequest()
+//        val cakeRequest = RetrofitInstance().retrofitInstance.create(GetCakeRequest::class.java)
+        val call: Observable<List<Cake>> = clientInterface.CakeRequest()
         call
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

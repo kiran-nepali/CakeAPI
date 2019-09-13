@@ -11,17 +11,34 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cakeapi_rxjava_mvvm.R
 import com.example.cakeapi_rxjava_mvvm.database.CakeAppDatabase
+import com.example.cakeapi_rxjava_mvvm.dependency_injection.application.MyApplication
+import com.example.cakeapi_rxjava_mvvm.dependency_injection.component.AppComponent
+import com.example.cakeapi_rxjava_mvvm.dependency_injection.component.DaggerAppComponent
+import com.example.cakeapi_rxjava_mvvm.dependency_injection.network_module.NetworkModule
 import com.example.cakeapi_rxjava_mvvm.model.Cake
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var mainActivityViewModelfactory: MainActivityViewModelFactory
+
+    private lateinit var viewModel: MainActivityViewModel
+
     private lateinit var roomdb: CakeAppDatabase
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        DaggerAppComponent.builder()
+            .networkModule(NetworkModule(application as MyApplication))
+            .build()
+            .inject(this)
+
+        viewModel = ViewModelProviders.of(this,mainActivityViewModelfactory).get(MainActivityViewModel::class.java)
         viewModel.getCakeInfo()
 
         val cakeinfo:MutableLiveData<List<Cake>>? = viewModel.passToMainActivity()
